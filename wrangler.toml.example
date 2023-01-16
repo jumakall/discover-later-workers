@@ -1,0 +1,12 @@
+name = "discover-later"
+main = "src/index.ts"
+compatibility_date = "2023-01-13"
+usage_model = "bundled"
+env = { }
+
+kv_namespaces = [
+    { binding = "discover_later_kv", id = "", preview_id = "" }
+]
+
+[triggers]
+crons = [ ]
