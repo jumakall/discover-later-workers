@@ -9,3 +9,10 @@ Spotify integration requires registering an Spotify Developer app, register one 
 ## Generate APP_SECRET
 APP_SECRET variable is required for JWT signatures, you can generate it like this.
 > openssl rand -base64 128
+
+## KV key formats
+User information
+> user-{service}-{id}
+
+Playlist configuration
+> playlists-{service}-{id}
