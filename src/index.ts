@@ -6,6 +6,7 @@ import { playlist_configuration } from './playlist'
 import { Spotify } from "./Spotify"
 import { loadUser, saveUser, User } from './User'
 
+// configure playlists supported by this application
 const CONFIG = {
     Playlists: [
         { 
@@ -62,7 +63,7 @@ export default {
 
             // initialize Spotify API
             const spotify = new Spotify(
-                "playlist-read-private playlist-modify-private",
+                "user-read-email playlist-read-private playlist-modify-private",
                 env.SPOTIFY_CLIENT_ID,
                 env.SPOTIFY_CLIENT_SECRET,
                 (new URL(request.url)).origin + "/callback/spotify",
@@ -95,12 +96,14 @@ export default {
                 // get current user profile
                 const profile = await spotify.getCurrentProfile()
 
-                // to do: get playlists from kv
+                // check if new account, if not return playlist configuration
 
                 const user = {
                     service: 'spotify',
                     external_user_id: profile.id,
                     display_name: profile.display_name,
+                    email: profile.email,
+                    
                     oauth_token: oauth_token,
                     playlists: [],
                 } as User
@@ -131,7 +134,7 @@ export default {
             const payload = await middleware.authenticate(request, env)
             
             // load user details from kv
-            const user = await loadUser(payload.user_id, env.discover_later_kv)
+            const user = await loadUser(payload.service+'-'+payload.external_user_id, env.discover_later_kv)
 
             // check that the user exists
             if (user === null) {
@@ -139,8 +142,6 @@ export default {
             }
 
             // set oauth token for Spotify API
-            console.log(JSON.stringify(user))
-            console.log(JSON.stringify(user.oauth_token))
             spotify.setAuthorization(user.oauth_token)
 
             // for debugging purposes
@@ -171,9 +172,8 @@ export default {
 
                 // attach configuration to user
                 user.playlists.push(...config)
-
                 // save user info to KV
-                await env.discover_later_kv.put(payload.user_id, JSON.stringify(user))
+                await env.discover_later_kv.put(payload.service+'-'+payload.external_user_id, JSON.stringify(user))
 
                 // return user
                 return respondWithUser(env.APP_SECRET, user, 200, 'Playlist enabled')

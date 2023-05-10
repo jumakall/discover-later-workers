@@ -4,6 +4,7 @@ import { User } from "./User"
 interface SpotifyProfile {
     display_name: string
     id: string
+    email: string
 }
 
 export class Spotify {

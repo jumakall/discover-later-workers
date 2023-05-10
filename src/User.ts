@@ -5,6 +5,7 @@ export interface User {
     service: string // eg. spotify
     external_user_id: string
     display_name: string
+    email: string
 
     oauth_token: oauth_tokens
 
